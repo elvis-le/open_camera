@@ -10,9 +10,15 @@
             text-align: center;
         }
         video, canvas {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
+            width: 100%; /* Đảm bảo video và canvas chiếm toàn bộ chiều rộng màn hình */
+            max-width: 600px; /* Đặt giới hạn chiều rộng tối đa */
+            height: auto; /* Tự động điều chỉnh chiều cao theo chiều rộng */
+        }
+        img {
+            width: 100%; /* Đảm bảo ảnh chụp vừa với màn hình */
+            max-width: 600px; /* Đặt giới hạn chiều rộng tối đa */
+            height: auto; /* Tự động điều chỉnh chiều cao theo chiều rộng */
+            margin-top: 10px; /* Khoảng cách trên dưới giữa các phần tử */
         }
         button {
             padding: 10px 20px;
@@ -62,7 +68,7 @@
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
 
-            // Cài đặt kích thước của canvas khớp với video
+            // Cài đặt kích thước của canvas bằng với video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
@@ -71,8 +77,9 @@
 
             // Chuyển đổi nội dung canvas thành ảnh và hiển thị
             const imageData = canvas.toDataURL('image/png'); // Xuất ảnh định dạng PNG
-            document.getElementById('capturedImage').src = imageData;
-            document.getElementById('capturedImage').style.display = 'block'; // Hiển thị ảnh
+            const capturedImage = document.getElementById('capturedImage');
+            capturedImage.src = imageData;
+            capturedImage.style.display = 'block'; // Hiển thị ảnh
         });
     </script>
 </body>

@@ -1,23 +1,47 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Access</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        video {
+            width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
     <h2>Camera Stream</h2>
-    <video id="video" width="320" height="240" autoplay></video>
+    <video id="video" autoplay playsinline></video> <!-- playsinline đảm bảo hoạt động trên iOS -->
+    <p id="errorMsg" style="color: red;"></p>
 
     <script>
-        // Yêu cầu quyền truy cập camera
-        navigator.mediaDevices.getUserMedia({ video: true })
+        // Kiểm tra xem trình duyệt có hỗ trợ API không
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // Yêu cầu truy cập camera
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { ideal: "environment" }, // Mở camera sau trên điện thoại
+                    width: { ideal: 1280 },               // Độ phân giải lý tưởng
+                    height: { ideal: 720 }
+                }
+            })
             .then(function(stream) {
                 var video = document.getElementById('video');
-                video.srcObject = stream;
+                video.srcObject = stream; // Hiển thị video stream từ camera
             })
             .catch(function(err) {
-                console.log("Error accessing camera: " + err);
+                document.getElementById('errorMsg').textContent = "Lỗi khi truy cập camera: " + err.name;
+                console.error("Error accessing camera: ", err);
             });
+        } else {
+            document.getElementById('errorMsg').textContent = "Trình duyệt của bạn không hỗ trợ truy cập camera.";
+        }
     </script>
 </body>
 </html>

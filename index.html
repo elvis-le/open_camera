@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,15 +9,15 @@
     <video id="video" width="320" height="240" autoplay></video>
 
     <script>
-        // Truy cập vào camera và hiển thị video stream
+        // Yêu cầu quyền truy cập camera
         navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function(stream) {
-            var video = document.getElementById('video');
-            video.srcObject = stream;
-        })
-        .catch(function(err) {
-            console.log("Error accessing camera: " + err);
-        });
+            .then(function(stream) {
+                var video = document.getElementById('video');
+                video.srcObject = stream;
+            })
+            .catch(function(err) {
+                console.log("Error accessing camera: " + err);
+            });
     </script>
 </body>
 </html>

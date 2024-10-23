@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quay Video từ Camera</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Camera Stream và Quay Video</h2>
+    <video id="video" autoplay playsinline muted></video> <!-- Phát video stream từ camera -->
+    <br>
+    <button id="startButton">Bắt đầu quay</button> <!-- Nút bắt đầu quay -->
+    <button id="stopButton" disabled>Ngừng quay</button> <!-- Nút ngừng quay -->
+    <br>
+    <a id="downloadLink" style="display:none;">Tải video đã quay</a> <!-- Link để tải video sau khi quay -->
+
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        async function openCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "environment", // Mở camera sau
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: true // Bật thu âm thanh
+                });
+
+                const videoElement = document.getElementById('video');
+                videoElement.srcObject = stream;
+
+                // Khởi tạo MediaRecorder để quay video
+                mediaRecorder = new MediaRecorder(stream);
+
+                // Khi video đang quay, dữ liệu sẽ được ghi vào các đoạn nhỏ
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                // Khi ngừng quay, tạo video từ các đoạn nhỏ đã ghi
+                mediaRecorder.onstop = function() {
+                    const blob = new Blob(recordedChunks, {
+                        type: 'video/webm' // Định dạng video
+                    });
+                    const videoURL = URL.createObjectURL(blob);
+
+                    // Tạo link để tải video
+                    const downloadLink = document.getElementById('downloadLink');
+                    downloadLink.href = videoURL;
+                    downloadLink.download = 'video_quay.webm'; // Tên file video tải về
+                    downloadLink.style.display = 'block'; // Hiển thị link tải
+                    downloadLink.textContent = 'Tải video đã quay';
+
+                    recordedChunks = []; // Reset các đoạn nhỏ để quay video mới
+                };
+            } catch (err) {
+                console.error("Lỗi truy cập camera: ", err);
+            }
+        }
+
+        // Mở camera khi trang được tải
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            openCamera();
+        } else {
+            alert("Trình duyệt của bạn không hỗ trợ truy cập camera.");
+        }
+
+        // Sự kiện khi nhấn nút Bắt đầu quay
+        document.getElementById('startButton').addEventListener('click', function() {
+            mediaRecorder.start(); // Bắt đầu quay video
+            document.getElementById('startButton').disabled = true;
+            document.getElementById('stopButton').disabled = false;
+        });
+
+        // Sự kiện khi nhấn nút Ngừng quay
+        document.getElementById('stopButton').addEventListener('click', function() {
+            mediaRecorder.stop(); // Ngừng quay video
+            document.getElementById('startButton').disabled = false;
+            document.getElementById('stopButton').disabled = true;
+        });
+    </script>
+</body>
+</html>
